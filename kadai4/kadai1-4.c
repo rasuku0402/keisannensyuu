@@ -99,25 +99,26 @@ void init(int n,double x,double*o){
 int main(){
     double c;
     double eps=1e-9;
-    int i,j;
+    int i,j,k;
+    double x_str[12] = {-1,1,10,10,10,10,10,10,10,10,10,10}; /*二分法の区間指定する配列*/
     for(i=1;i<=10;i++){
         double x_s[10] = {0}; /*二分法によって得られる解を格納する配列*/
         printf("n=%d\n", i);
-        for(j=0;j<i;j++){
-          int size = sizeof(double);
-          double *x_str = malloc((i+2)*size);
 
-          if(i == 1){
-              init(i+2, 0, x_str);
-              x_str[0] = -1;
-              x_str[1] = 1;
-          }
-          
+        /*ルジャンドル多項式の解を計算する*/
+        
+        for(j=0;j<i;j++){
           x_s[j] = bisec(x_str[j],x_str[j+1],eps,i);
-          printf("%.10lf\n", x_s);
-          shiftright(x_str,i+2);/*配列を右シフト*/
-          bouble(i+2, x_str);
+          printf("%.10lf\n", x_s[j]);
+
+        }
+        /*x_strを更新する*/
+
+        for(j =0;j<i;j++){
+          shiftright(x_str,12);/*配列を右シフト*/
+          x_str[0] = x_s[j];
         }       
+        bouble(12, x_str);
     }
 
     return 0;
