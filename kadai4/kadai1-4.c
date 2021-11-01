@@ -62,7 +62,7 @@ double P(double x, double n){
 /* 二分法 初期値 x1<x2 と 誤差限界 eps を入力 */
 double bisec(double x1, double x2, double eps,int n) {
     double c;
-    while (fabs(x2 - x1) >= eps) {
+    while ((x2 - x1) >= eps) {
         c = (x1+x2)/2.0; /* 中点計算 */
         if ((P(x1, n)*P(c,n))> 0) {
              /* 同符号か判定 */
@@ -70,7 +70,6 @@ double bisec(double x1, double x2, double eps,int n) {
         } else {
 
             x2 = c;
-            break;
         }
         
     }
@@ -109,7 +108,7 @@ int main(){
 
         for(j=0;j<i;j++){
           x_s[j] = bisec(x_str[j],x_str[j+1],eps,i);
-          printf("%.10lf\n", x_s[j]);
+          printf("%.9lf\n", x_s[j]);
 
         }
         /*x_strを更新する*/
