@@ -20,8 +20,10 @@ int main()
     double a;
     int b;
     double c;
-    printf("Input variable:");
-    scanf("%lf%d", &a,&b);
+    printf("Input variable n=");
+    scanf("%lf", &a);
+    printf("Input variable k=");
+    scanf("%d", &b);
     c = Combi(a,b);
     printf("%f\n", c);
     return 0;
