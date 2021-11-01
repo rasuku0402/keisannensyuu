@@ -100,20 +100,25 @@ int main(){
     double c;
     double eps=1e-9;
     int i,j,k;
-    double x_str[12] = {-1,1,10,10,10,10,10,10,10,10,10,10}; /*二分法の区間指定する配列*/
+    double x_str[12] = {-1,1,2,2,2,2,2,2,2,2,2,2}; /*二分法の区間指定する配列*/
     for(i=1;i<=10;i++){
         double x_s[10] = {0}; /*二分法によって得られる解を格納する配列*/
         printf("n=%d\n", i);
 
         /*ルジャンドル多項式の解を計算する*/
-        
+
         for(j=0;j<i;j++){
           x_s[j] = bisec(x_str[j],x_str[j+1],eps,i);
           printf("%.10lf\n", x_s[j]);
 
         }
         /*x_strを更新する*/
-
+        /*もう一度初期化*/
+        x_str[0] = -1;
+        x_str[1] = 1;
+        for(j=2;j<12;j++){
+            x_str[j] = 2;
+        }
         for(j =0;j<i;j++){
           shiftright(x_str,12);/*配列を右シフト*/
           x_str[0] = x_s[j];
