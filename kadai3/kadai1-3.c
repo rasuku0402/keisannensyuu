@@ -2,12 +2,64 @@
 #include <stdlib.h>
 #include <math.h>
 
-double f(double x){
-    return (63/8)*x*x*x*x*x - (35/4)*x*x*x + (15/8)*x;
+/*二項係数を計算するCombi関数*/
+
+double Combi(double n, int r){
+  double i;
+  double c = 1.0;  
+  if(r==0){
+    return c;
+  }else{
+    for(i=n;i>=n-r+1;i--){
+      c=c*i;
+  }
+  for(i=1;i<=r;i++){
+      c=c/i;
+  }
+  return c;
+  }
 }
 
-double df(double x){
-    return (315/8)*x*x*x*x - (105/4)*x*x + 15/8 ;
+/*ルジャンドル多項式の係数a_n_kを計算する関数*/
+
+
+double legendre(double n, int k){
+    int i;
+    int a = 1;
+    for(i=n;i>0;i--){
+        a = 2*a;
+    }
+    double c = Combi(n,k);
+    double d = Combi(((n+k-1)/2), n);
+    return a*c*d;
+}
+
+/* ルジャンドル多項式P_n(x)を返す関数 */
+double f(double x, double n){
+    int k;
+    double c[12]= {0};
+    double d = 0;
+    for(k=0;k<=n;k++){
+        c[k] = legendre(n,k);
+        d = d + c[k]*pow(x,k);
+    }
+    return d;
+}
+
+/*dP/dxを計算を返す関数*/
+
+double df(double x, double n){
+    double c[12] = {0};
+    double d[12] = {0};
+    int k;
+    double e = 0;
+    for(k=0;k<=n;k++){
+        c[k] = legendre(n,k);
+        d[k] = k*c[k];   /*微分した係数*/
+        e = e + d[k]*pow(x,k-1);  /*xのk-1乗を加算していく*/
+    }
+
+    return e;
 }
 
 int main(){
@@ -22,39 +74,39 @@ int main(){
 
     while(esp > 1e-9){
         x = x_st1;
-        x_st1 = x_st1 - f(x_st1)/df(x_st1);
+        x_st1 = x_st1 - f(x_st1,5)/df(x_st1,5);
         esp = fabs(x_st1 - x);
     }
-    printf("%lf\n", x_st1);
+    printf("%.9lf\n", x_st1);
     esp = 100;
     while(esp > 1e-9){
         x = x_st2;
-        x_st2 = x_st2 - f(x_st2)/df(x_st2);
+        x_st2 = x_st2 - f(x_st2,5)/df(x_st2,5);
         esp = fabs(x_st2 - x);
     }
-    printf("%lf\n", x_st2);
+    printf("%.9lf\n", x_st2);
     esp = 100;
     while(esp > 1e-9){
         x = x_st3;
-        x_st3 = x_st3 - f(x_st3)/df(x_st3);
+        x_st3 = x_st3 - f(x_st3,5)/df(x_st3,5);
         esp = fabs(x_st3 - x);
         printf("esp = %lf\n", esp);
     }
-    printf("%lf\n", x_st3);
+    printf("%.9lf\n", x_st3);
     esp = 100;
     while(esp > 1e-9){
         x = x_st4;
-        x_st4 = x_st4 - f(x_st4)/df(x_st4);
+        x_st4 = x_st4 - f(x_st4,5)/df(x_st4,5);
         esp = fabs(x_st4 - x);
     }
-    printf("%lf\n", x_st4);
+    printf("%.9lf\n", x_st4);
     esp = 100;
     while(esp > 1e-9){
         x = x_st5;
-        x_st5 = x_st5 - f(x_st5)/df(x_st5);
+        x_st5 = x_st5 - f(x_st5,5)/df(x_st5,5);
         esp = fabs(x_st5 - x);
     }
-    printf("%lf\n", x_st5);
+    printf("%.9lf\n", x_st5);
 
     return 0;
 }
