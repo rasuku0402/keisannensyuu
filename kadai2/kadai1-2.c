@@ -51,11 +51,9 @@ double bisec(double x1, double x2, double eps) {
         if ((P(x1,5)*P(c,5)) > 0) {
              /* 同符号か判定 */
             x1 = c;
-            printf("esp = %.9lf\n", x1);
         } else {
 
             x2 = c;
-            printf("esp = %.9lf\n", x2);
         }
     }
     return c;
