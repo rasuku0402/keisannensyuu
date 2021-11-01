@@ -41,7 +41,7 @@ int main(){
     scanf("%lf", &a);   /*後でscanfに修正する*/
     for(b=0;b<=a;b++){
         c = legendre(a,b);   /*forループでa_(n,0)からa_(n,n)まで求めて出力します*/
-        printf("%lf\n", c);
+        printf("a_(%f, %d) = %lf\n", a,b,c);
     }
     return 0;
 }
