@@ -1,15 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 
-double kaijou(double k){
-  int i;
-  double c = 1;
-  for(i=k;i>=0;i--){
-    c = c*i;
-  }
-  return c;
-}
-
 /*二項係数を求める関数*/
 
 double Combi(double n, int r){
@@ -46,8 +37,8 @@ int main(){
     double a;
     int b;
     double c;
-    printf("Input variable:");
-    a=5;   /*後でscanfに修正する*/
+    printf("Input variable n = ");
+    scanf("%lf", &a);   /*後でscanfに修正する*/
     for(b=0;b<=a;b++){
         c = legendre(a,b);   /*forループでa_(n,0)からa_(n,n)まで求めて出力します*/
         printf("%lf\n", c);
