@@ -87,52 +87,6 @@ void input_vector(double *b, char c, FILE *fin, FILE *fout){
     }
 }
 
-/*行列とベクトルの積の計算を実行するサブルーチン (課題2-1-1)*/
-void matrix_vector_product(double **a, double *b, double *c){
-    int i,j;
-    for(i=1;i<=N;i++){ 
-        c[i] = 0;
-        for(j=1;j<=N;j++){
-            c[i] = a[i][j]*b[j] + c[i];
-        }
-    }
-}
-
-/*LU分解を行うサブルーチン(課題2-1-2)*/
-
-void lu_decom(double **a, int *p){
-    int i,j,k,ip;
-    double alpha, tmp;
-    double amax, eps = pow(2.0, -50.0); /*eps,amaxは入力された行列が正則であるかを判断するための変数*/
-
-    for(k=1;k<=N-1;k++){
-        amax = fabs(a[k][k]); ip = k;
-        for(i=k+1;i<=N;i++){
-            if(fabs(a[i][k])> amax){
-                amax = fabs(a[i][k]); ip = i;
-            }
-        }
-    /*正則性の判定*/
-    if(amax < eps) printf("入力された行列は正則ではありません\n");
-    /*ip を配列pに保存*/
-    p[k] = ip;
-    /*行交換*/
-    if(ip != k){
-        for(j=k;j<=N;j++){
-            tmp = a[k][j]; a[k][j] = a[ip][j]; a[ip][j] = tmp;
-        }
-    }
-    /*前進消去*/
-    for(i=k+1;i<=N;i++){
-        alpha = -a[i][k]/a[k][k];
-        a[i][k] = alpha;
-        for(j=k+1;j<=N;j++){
-            a[i][j] = a[i][j] + alpha*a[k][j];
-        }
-    }
-    }
-
-}
 
 
 /*比較関数(配列を昇順に並べ替えるqsort関数に必要)*/
@@ -197,5 +151,38 @@ double *jacobi(double **a, double *b, double *x){
 
 
 int main(){
+    FILE *fin, *fout;
+    double **a, *b, *x;
+    int i;
+
+    a = dmatrix(1,N,1,N);
+    b = dvector(1,N);
+    x = dvector(1,N);
+
+    /*ファイルのオープン*/
+    if((fin = fopen("input_sp.dat", "r"))==NULL){
+        printf("ファイルが見つかりません：input_sp.dat \n");
+        exit(1);
+    }
+    if((fout = fopen("output_sp.dat", "w")) == NULL){
+        printf("ファイルが作成できません：output_sp.dat \n");
+        exit(1);
+    }
+
+    input_matrix(a,'A',fin,fout);  /*行列Aの入出力*/
+    input_vector(b,'b',fin,fout); /*ベクトルbの入出力*/
+    input_vector(x,'x',fin,fout); /*初期ベクトルx_0の入力*/
+
+    x = jacobi(a,b,x);
+
+    fprintf(fout, "Ax = bの解は次の通りです\n");
+    for(i=1;i<=N;i++){
+        fprintf(fout, "%f\n", x[i]);
+    }
+    fclose(fin); fclose(fout);
+    free_dmatrix(a,1,N,1,N);
+    free_dvector(b,1);
+    free_dvector(x,1);
+
     return 0;
 }
