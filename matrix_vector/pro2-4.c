@@ -3,6 +3,8 @@
 #include <math.h>
 
 #define N  9 /*正方行列のサイズ*/
+#define KMAX  10000 /*最大反復回数*/
+#define EPS  1E-10 /*最大誤差*/
 
 /*行列の領域確保*/
 double **dmatrix(int nr1, int nr2, int nl1, int nl2){
@@ -163,6 +165,67 @@ double *lu_solve(double **a, double *b, int *p){
     return b;
 }
 
+/*比較関数(配列を昇順に並べ替えるqsort関数に必要)*/
+int double_comp(const void *s1, const void *s2){
+    const double a1 = *((double *)s1); 
+    const double a2 = *((double *)s2);
+
+    if(a1 < a2){
+        return -1;
+    }else if(a1 == a2){
+        return 0;
+    }else{
+        return 1;
+    }
+}
+
+/*最大値ノルムの計算(課題2-1-3で使う)*/
+double vector_norm_max(double *a, int m, int n){
+    int i,tmp;
+    tmp = n-m+1 ;/*全要素数の計算*/
+
+    for(i=m;i<=n;i++) a[i] = fabs(a[i]);
+    qsort(a+m, tmp, sizeof(a[0]), double_comp);
+
+    return a[n];
+
+}
+
+/*ヤコビ法* (課題2-1-3)*/
+double *jacobi(double **a, double *b, double *x){
+    double eps, *xn;
+    int i,j,k=0;
+
+    xn = dvector(1,N); 
+
+    do{
+        for(i=1;i<=N;i++){
+            xn[i] = b[i]; 
+            for(j=1;j<=N;j++){
+                xn[i] -= a[i][j]*x[j]; 
+            }
+            xn[i] += a[i][i]*x[i];
+            xn[i] /=a[i][i];
+        }
+
+        for(i=1;i<=N;i++) x[i] = xn[i] -x[i];
+        eps = vector_norm_max(x,1,N); /*最大値ノルムの計算*/
+        printf("eps%d = %f", k, eps);
+        for(i=1;i<=N;i++) x[i] = xn[i];
+        k++;
+
+    }while(eps > EPS && k < KMAX);
+    free_dvector(xn, 1);
+    if(k==KMAX){
+        printf("答えが見つかりませんでした\n");
+        exit(1);
+    }else{
+        printf("反復回数は%d回です\n", k);
+        return x;
+    }
+}
+
+
 
 
 
@@ -193,7 +256,7 @@ int main(){
 
 
     /*行列の積の計算*/
-    matrix_vector_product(a,α,b);
+    matrix_vector_product(a,α,b); /*aα=bを計算*/
     /*結果の表示*/
     printf("Aα=bで求めたベクトルbは以下の通りです \n");
     for(j=1;j<=N;j++){
@@ -201,8 +264,8 @@ int main(){
     }
     printf("\n");
 
-    lu_decom(a, p);
-    b = lu_solve(a,b,p);
+    lu_decom(a, p); /*行列AをLU分解*/
+    b = lu_solve(a,b,p); /*Ax = bを出力 (ここではbが解として出力されている)*/
 
 
     
