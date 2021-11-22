@@ -21,8 +21,12 @@ int main(){
 
     printf("aの領域確保\n"); /*配列aの添え字は1~N*/
     a = dvector(1,N);
+    for (i=1;i<=N;i++){
+        a[i] = (double)i/20.0;
+        printf("a[%d] = %f \n", i, a[i]);
+    }
+    free_dvector(a,1);
     printf("aを解放\n");
-
 
     return 0;
 
