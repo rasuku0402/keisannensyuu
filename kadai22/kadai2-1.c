@@ -103,6 +103,24 @@ int double_comp(const void *s1, const void *s2){
     }
 }
 
+/*ベクトルの差を求める関数(a-b)*/
+void vector_sum(double *a, double *b, double *c, int n){
+    int i;
+    for(i=1;i<=n;i++){
+        c[i] = a[i] - b[i];
+    }
+}
+
+/*ベクトルノルムを求める関数*/
+double vector_norm1(double *a, int n){
+    int i;
+    double norm = 0.0;
+    for(i = 1; i<=n;i++){
+        norm += fabs(a[i]);
+    }
+    return norm;
+}
+
 /*最大値ノルムの計算(課題2-1-3で使う)*/
 double vector_norm_max(double *a, int m, int n){
     int i,tmp;
@@ -112,15 +130,26 @@ double vector_norm_max(double *a, int m, int n){
     qsort(a+m, tmp, sizeof(a[0]), double_comp);
 
     return a[n];
+}
 
+/*行列とベクトルの積の計算を実行するサブルーチン (課題2-1-1)*/
+void matrix_vector_product(double **a, double *b, double *c){
+    int i,j;
+    for(i=1;i<=N;i++){ 
+        c[i] = 0;
+        for(j=1;j<=N;j++){
+            c[i] = a[i][j]*b[j] + c[i];
+        }
+    }
 }
 
 /*ヤコビ法* (課題2-1-3)*/
 double *jacobi(double **a, double *b, double *x){
-    double eps, *xn;
+    double eps, *xn, *c, *r; /*cはAx_k= cであり、残差ノルムの計算に使う,rは残差ベクトル*/
     int i,j,k=0;
-
     xn = dvector(1,N); 
+    c = dvector(1,N);
+    r = dvector(1,N);
 
     do{
         for(i=1;i<=N;i++){
@@ -132,10 +161,13 @@ double *jacobi(double **a, double *b, double *x){
             xn[i] /=a[i][i];
         }
 
-        for(i=1;i<=N;i++) x[i] = xn[i] -x[i];
-        eps = vector_norm_max(x,1,N); /*最大値ノルムの計算*/
-        printf("eps%d = %f", k, eps);
-        for(i=1;i<=N;i++) x[i] = xn[i];
+        /*for(i=1;i<=N;i++) x[i] = xn[i] -x[i];  epsを最大値ノルム使って求めなければいらん(多分)*/
+        matrix_vector_product(a, xn, c);
+        vector_sum(b, c, r,N); /*残差ベクトルrを求めた*/
+        eps = vector_norm1(r,N);
+        /*eps = vector_norm_max(x,1,N);  最大値ノルムの計算(多分間違ってる)*/
+        printf("eps%d = %.10f\n", k, eps);
+        for(i=1;i<=N;i++) x[i] = xn[i]; /* x_kをx_k+1に更新*/
         k++;
 
     }while(eps > EPS && k < KMAX);
