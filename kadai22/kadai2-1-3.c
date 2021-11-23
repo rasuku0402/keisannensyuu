@@ -214,7 +214,7 @@ double *gauss_seidel(double **a, double *b, double *x, FILE *fin, FILE *fout){
         fprintf(fout, "eps%d = %.11f\n", k, eps);
         k++;
     }while(eps> EPS && k < KMAX);
-    
+
     free_dvector(xo, 1);
     free_dvector(c, 1);
     free_dvector(r,1);
@@ -226,6 +226,50 @@ double *gauss_seidel(double **a, double *b, double *x, FILE *fin, FILE *fout){
         return x;
     }
 } 
+
+/*SOR法 (課題2-1-3)*/
+double *sor(double **a, double *b, double *x, double w, FILE *fin, FILE *fout){
+    double eps,*xo,s,t,*c,*r;
+    int i,j,k=0;
+    xo = dvector(1,N);
+    c = dvector(1,N);
+    r = dvector(1,N);
+
+    do{
+        for(i=1;i<=N;i++) xo[i] = x[i];
+        t = 0.0;
+        for(j=2;j<=N;j++) t += a[1][j]*xo[j];
+        x[1] = (b[1] -t)/a[1][1];
+        for(i=2;i<=N;i++){
+            s=0.0; t=0.0;
+            for(j=1;j<i;j++) s += a[i][j]*x[j];
+            for(j=i+1;j<=N;j++) t += a[i][j]*xo[j];
+            x[i] = (b[i] -s-t)/a[i][i];
+        }
+        /*ここまではgauss法と同じ*/
+
+        /*SOR法*/
+        for(i=1;i<=N;i++){
+            x[i] = xo[i] + w*(x[i] - xo[i]);
+        }
+        matrix_vector_product(a, x, c);
+        vector_sum(b, c, r, N); /*残差ベクトルrを求めた*/
+        eps = vector_norm1(r,N);
+        fprintf(fout, "eps%d = %.11f\n", k, eps);
+        k++;  
+    }while(eps> EPS && k < KMAX);
+
+    free_dvector(xo, 1);
+    free_dvector(c, 1);
+    free_dvector(r,1);
+    if(k == KMAX){
+        printf("答えが見つかりませんでした\n");
+        exit(1);
+    }else{
+        printf("反復回数は%d回です\n", k);
+        return x;
+    }    
+}
 
 
 int main(){
@@ -261,7 +305,10 @@ int main(){
     
     fclose(fin); fclose(fout); /*ヤコビ法終わり*/
 
+
+
     /*ここからGauss-Seidel.ファイルのオープン*/
+
     if((fin = fopen("input_sp.dat", "r"))==NULL){
         printf("ファイルが見つかりません：input_sp.dat \n");
         exit(1);
@@ -282,6 +329,27 @@ int main(){
     }
 
     fclose(fin); fclose(fout); /*gauss法終わり*/
+
+    /*ここからSOR.ファイルのオープン*/
+    if((fin = fopen("input_sp.dat", "r"))==NULL){
+        printf("ファイルが見つかりません：input_sp.dat \n");
+        exit(1);
+    }
+    if((fout = fopen("output_SOR.dat", "w")) == NULL){
+        printf("ファイルが作成できません：output_gauss.dat \n");
+        exit(1);
+    }
+
+    input_matrix(a,'A',fin,fout);  /*行列Aの入出力*/
+    input_vector(b,'b',fin,fout); /*ベクトルbの入出力*/
+    input_vector(x,'x',fin,fout); /*初期ベクトルx_0の入力*/
+
+    x = sor(a,b,x,1.81,fin,fout);
+    fprintf(fout, "SOR法によるAx = bの解は次の通りです\n");
+    for(i=1;i<=N;i++){
+        fprintf(fout, "%.11f\n", x[i]);
+    }
+    fclose(fin); fclose(fout); /*SOR法終わり*/
 
 
     free_dmatrix(a,1,N,1,N);
